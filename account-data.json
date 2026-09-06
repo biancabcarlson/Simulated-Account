@@ -1,0 +1,97 @@
+{
+  "profile": {
+    "name": "Jane Doe",
+    "accountNumber": "4821009348218",
+    "accountNumberMasked": "•••• •••• 4821",
+    "phone": "(415) 555-0148",
+    "email": "jane.doe@example.com",
+    "address": "42 Bayview Ter, San Francisco, CA",
+    "accountType": "Personal Checking + Crypto",
+    "memberSince": "2025-01-14",
+    "status": "active",
+    "kycStatus": "verified"
+  },
+
+  "activityLog": [
+    { "date": "2026-08-31T09:40:00", "event": "payee_added", "detail": "External payee added: Marcus T. — account ending 1187", "flagged": true },
+    { "date": "2026-08-30T00:18:00", "event": "twofactor_method_changed", "detail": "SMS -> Email (temporary, self-service)", "flagged": true },
+    { "date": "2026-08-28T18:41:00", "event": "password_reset", "detail": "Self-service password reset" },
+    { "date": "2026-07-30T14:03:00", "event": "phone_updated", "detail": "(415) 555-0119 -> (415) 555-0148" },
+    { "date": "2026-03-22T09:18:00", "event": "beneficiary_added", "detail": "Added M. Doe as payable-on-death beneficiary" },
+    { "date": "2026-02-08T16:52:00", "event": "security_question_reset", "detail": "Initiated after failed login attempts", "flagged": true },
+    { "date": "2025-11-02T11:27:00", "event": "ach_account_linked", "detail": "Ally Bank Savings •••7790" },
+    { "date": "2025-08-19T08:14:00", "event": "2fa_enabled", "detail": "Method: SMS" },
+    { "date": "2025-08-19T08:09:00", "event": "email_changed", "detail": "j.doe88@example.com -> jane.doe@example.com" },
+    { "date": "2025-06-03T13:40:00", "event": "address_updated", "detail": "118 Elm St, Oakland, CA -> 42 Bayview Ter, San Francisco, CA" },
+    { "date": "2025-01-16T10:02:00", "event": "ach_account_linked", "detail": "Chase Checking •••4821 (set as default)" },
+    { "date": "2025-01-14T15:55:00", "event": "kyc_completed", "detail": "Document + selfie match" },
+    { "date": "2025-01-14T15:41:00", "event": "account_created", "detail": "Opened via mobile app, referral code EB-2025" }
+  ],
+
+  "paymentMethods": {
+    "bankAccounts": [
+      { "institution": "Chase", "type": "checking", "accountLast4": "4821", "routingLast4": "0021", "status": "verified", "default": true, "dateAdded": "2025-01-16" },
+      { "institution": "Ally Bank", "type": "savings", "accountLast4": "7790", "routingLast4": "0544", "status": "verified", "default": false, "dateAdded": "2025-11-02" }
+    ],
+    "cards": [
+      { "brand": "Visa", "type": "debit", "last4": "5567", "expiry": "09/28", "status": "active", "dateAdded": "2025-01-14" },
+      { "brand": "Mastercard", "type": "credit", "last4": "1190", "expiry": "03/27", "status": "removed", "dateAdded": "2025-05-11", "dateRemoved": "2025-06-20" }
+    ],
+    "cryptoWallets": [
+      { "provider": "Coinbase", "asset": "BTC", "address": "bc1q...4f2a", "allowlisted": true, "status": "verified", "dateAdded": "2026-04-02" }
+    ]
+  },
+
+  "achTransactions": [
+    { "date": "2026-09-01", "type": "deposit",    "amount": 2400.00,  "account": "Chase •••4821", "status": "completed", "reference": "ACH-88213" },
+    { "date": "2026-08-31", "type": "withdrawal", "amount": -4800.00, "account": "External •••1187 (new payee, added same week)", "status": "pending", "reference": "ACH-88300", "flagged": true },
+    { "date": "2026-08-15", "type": "withdrawal", "amount": -500.00,  "account": "Ally •••7790",  "status": "completed", "reference": "ACH-88147" },
+    { "date": "2026-08-01", "type": "deposit",    "amount": 2400.00,  "account": "Chase •••4821", "status": "completed", "reference": "ACH-88022" },
+    { "date": "2026-07-22", "type": "withdrawal", "amount": -1200.00, "account": "Chase •••4821", "status": "returned", "statusDetail": "R01 - insufficient funds", "reference": "ACH-87911" },
+    { "date": "2026-07-15", "type": "deposit",    "amount": 2400.00,  "account": "Chase •••4821", "status": "completed", "reference": "ACH-87804" },
+    { "date": "2026-06-30", "type": "withdrawal", "amount": -300.00,  "account": "Ally •••7790",  "status": "completed", "reference": "ACH-87650" },
+    { "date": "2026-06-01", "type": "deposit",    "amount": 2400.00,  "account": "Chase •••4821", "status": "completed", "reference": "ACH-87400" },
+    { "date": "2026-05-18", "type": "withdrawal", "amount": -5000.00, "account": "Chase •••4821", "status": "pending", "reference": "ACH-87255" },
+    { "date": "2026-05-01", "type": "deposit",    "amount": 2400.00,  "account": "Chase •••4821", "status": "completed", "reference": "ACH-87050" }
+  ],
+
+  "cryptoActivity": [
+    { "date": "2026-08-30", "type": "buy",        "asset": "BTC",  "amount": 0.0421, "usdValue": 2850.00, "wallet": "internal_custody", "status": "completed" },
+    { "date": "2026-08-20", "type": "withdrawal", "asset": "BTC",  "amount": 0.0150, "usdValue": 1015.50, "wallet": "bc1q...4f2a", "status": "completed", "networkFee": "0.0002 BTC" },
+    { "date": "2026-07-28", "type": "sell",       "asset": "ETH",  "amount": 1.2000, "usdValue": 3960.00, "wallet": "internal_custody", "status": "completed" },
+    { "date": "2026-07-10", "type": "deposit",    "asset": "USDC", "amount": 5000.00, "usdValue": 5000.00, "wallet": "0x8f...c91d", "status": "completed" },
+    { "date": "2026-06-14", "type": "buy",        "asset": "ETH",  "amount": 0.8500, "usdValue": 2720.00, "wallet": "internal_custody", "status": "completed" },
+    { "date": "2026-04-02", "type": "withdrawal", "asset": "BTC",  "amount": 0.1000, "usdValue": 6430.00, "wallet": "bc1q...4f2a", "status": "flagged", "statusDetail": "Withdrawal to address added same day", "networkFee": "0.0003 BTC" }
+  ],
+
+  "loginLog": [
+    { "datetime": "2026-09-04T20:12:00", "ip": "73.162.44.9",     "location": "San Francisco, CA, US", "device": "iPhone — Safari 18",   "result": "success", "notes": "Trusted device" },
+    { "datetime": "2026-09-02T07:05:00", "ip": "73.162.44.9",     "location": "San Francisco, CA, US", "device": "iPhone — Safari 18",   "result": "success", "notes": "Trusted device" },
+    { "datetime": "2026-08-30T00:24:00", "ip": "185.220.101.47",  "location": "Bucharest, RO",          "device": "Windows — Chrome 128", "result": "success", "notes": "Succeeded after 2FA method changed to email; device not on trusted list", "flagged": true },
+    { "datetime": "2026-08-29T23:47:00", "ip": "185.220.101.47",  "location": "Bucharest, RO",          "device": "Windows — Chrome 128", "result": "failed", "notes": "Failed 3x, account locked 30 min" },
+    { "datetime": "2026-08-29T23:52:00", "ip": "185.220.101.47",  "location": "Bucharest, RO",          "device": "Windows — Chrome 128", "result": "mfa_challenge", "notes": "Challenge sent, not completed" },
+    { "datetime": "2026-08-19T09:03:00", "ip": "98.42.11.203",    "location": "San Francisco, CA, US", "device": "MacBook — Chrome 127", "result": "success", "notes": "New device, verified via email" },
+    { "datetime": "2026-07-01T13:15:00", "ip": "73.162.44.9",     "location": "San Francisco, CA, US", "device": "iPhone — Safari 17",   "result": "success", "notes": "Trusted device" }
+  ],
+
+  "security": {
+    "kyc": { "status": "verified", "verifiedOn": "2025-01-14", "idType": "CA Driver's License", "vendor": "IDVerify Co.", "matchConfidence": 0.982 },
+    "twoFactor": { "method": "SMS", "enabledOn": "2025-08-19", "backupCodesRemaining": 8 },
+    "trustedDevices": ["iPhone 15", "MacBook Pro"],
+    "riskFlags": [
+      { "date": "2026-08-31", "type": "large_withdrawal_new_payee", "status": "open", "resolvedOn": null },
+      { "date": "2026-08-30", "type": "2fa_method_downgrade", "status": "open", "resolvedOn": null },
+      { "date": "2026-04-02", "type": "crypto_withdrawal_new_address", "status": "cleared", "resolvedOn": "2026-04-05" },
+      { "date": "2026-08-29", "type": "login_anomaly", "status": "monitoring", "resolvedOn": null }
+    ]
+  },
+
+  "documents": {
+    "statements": ["2026-08", "2026-07", "2026-06"],
+    "taxDocuments": [
+      { "type": "1099-INT", "taxYear": 2025 },
+      { "type": "1099-B", "taxYear": 2025, "note": "Crypto activity" }
+    ],
+    "other": ["Account agreement (signed 2025-01-14)", "W-9 on file"]
+  }
+}
