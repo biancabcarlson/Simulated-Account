@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Example Bank — Account Hub (Mock)</title>
+<style>
+  :root{
+    --bg: #EEF2EF;
+    --surface: #FFFFFF;
+    --ink: #142019;
+    --muted: #5B665F;
+    --faint: #8B948D;
+    --border: #DCE3DD;
+    --accent: #2F6F4E;
+    --accent-light: #E3EFE8;
+    --amber: #B4700C;
+    --amber-light: #FBF0DE;
+    --red: #A5311F;
+    --red-light: #FBEAE6;
+    --blue: #2A5C8A;
+    --blue-light: #E7EFF6;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:920px;margin:0 auto;padding:0 0 48px;}
+  .banner{
+    background:var(--ink);
+    color:#F2F5F2;
+    padding:10px 20px;
+    font-size:12px;
+    letter-spacing:.2px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .banner .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);flex:none;}
+  header.hdr{
+    padding:20px 20px 0;
+  }
+  .hdr-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand{font-size:14px;font-weight:600;color:var(--accent);letter-spacing:.2px;}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--accent-light);color:var(--accent);
+    padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;
+  }
+  .status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .profile-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    margin-top:16px;
+    display:grid;
+    grid-template-columns: 56px 1fr;
+    gap:16px;
+  }
+  .avatar{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:19px;font-weight:600;
+  }
+  .profile-name{font-size:19px;font-weight:600;margin:0 0 2px;}
+  .profile-sub{font-size:13px;color:var(--muted);margin:0;}
+  .field-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:14px 20px;
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+  }
+  .field label{
+    display:block;font-size:11px;color:var(--faint);
+    text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;
+  }
+  .field .val{font-family:var(--mono);font-size:14px;}
+  .reveal-btn{
+    background:none;border:none;color:var(--accent);
+    font-size:11px;cursor:pointer;padding:0;margin-left:8px;
+    text-decoration:underline;font-family:var(--sans);
+  }
+  nav.tabs{
+    display:flex;gap:2px;margin-top:22px;
+    overflow-x:auto;
+    border-bottom:1px solid var(--border);
+    padding:0 20px;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    background:none;border:none;
+    padding:12px 14px;font-size:13.5px;font-weight:500;
+    color:var(--muted);cursor:pointer;white-space:nowrap;
+    border-bottom:2px solid transparent;
+    font-family:var(--sans);
+  }
+  nav.tabs button.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:600;}
+  main{padding:22px 20px 0;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  h2.section-title{font-size:15px;font-weight:600;margin:28px 0 4px;}
+  h2.section-title:first-child{margin-top:0;}
+  p.section-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+
+  /* timeline */
+  .timeline{list-style:none;margin:0;padding:0;border-left:1px solid var(--border);margin-left:6px;}
+  .timeline li{
+    position:relative;padding:0 0 20px 22px;
+  }
+  .timeline li::before{
+    content:"";position:absolute;left:-5px;top:3px;
+    width:9px;height:9px;border-radius:50%;
+    background:var(--surface);border:2px solid var(--accent);
+  }
+  .timeline li.flagged::before{border-color:var(--amber);}
+  .tl-title{font-size:13.5px;font-weight:600;margin:0 0 2px;}
+  .tl-meta{font-size:12px;color:var(--muted);margin:0 0 3px;}
+  .tl-detail{font-size:12.5px;color:var(--muted);margin:0;}
+
+  /* data table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{
+    text-align:left;font-size:11px;color:var(--faint);
+    text-transform:uppercase;letter-spacing:.4px;
+    padding:0 10px 8px;border-bottom:1px solid var(--border);
+    font-weight:600;
+  }
+  tbody td{
+    padding:11px 10px;border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.num, th.num{font-family:var(--mono);}
+  .amt-pos{color:var(--accent);font-family:var(--mono);}
+  .amt-neg{color:var(--red);font-family:var(--mono);}
+  .badge{
+    display:inline-block;padding:2px 8px;border-radius:20px;
+    font-size:11px;font-weight:600;white-space:nowrap;
+  }
+  .badge.ok{background:var(--accent-light);color:var(--accent);}
+  .badge.pending{background:var(--amber-light);color:var(--amber);}
+  .badge.fail{background:var(--red-light);color:var(--red);}
+  .badge.flag{background:var(--red-light);color:var(--red);}
+  .badge.info{background:var(--blue-light);color:var(--blue);}
+  .badge.removed{background:#EFEDE6;color:var(--faint);}
+
+  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
+  .table-wrap table{min-width:640px;}
+  .table-wrap.narrow table{min-width:0;}
+
+  /* payment method rows */
+  .pm-group{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+  .pm-row{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);
+  }
+  .pm-row:last-child{border-bottom:none;}
+  .pm-main{display:flex;flex-direction:column;gap:2px;}
+  .pm-name{font-size:13.5px;font-weight:600;}
+  .pm-sub{font-size:12px;color:var(--muted);font-family:var(--mono);}
+  .pm-right{text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end;}
+  .pm-date{font-size:11.5px;color:var(--faint);}
+
+  .kv-card{
+    border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;
+  }
+  .kv-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .kv-row:last-child{border-bottom:none;}
+  .kv-row .k{color:var(--muted);}
+  .kv-row .v{font-family:var(--mono);text-align:right;}
+
+  .doc-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:11px 4px;border-bottom:1px solid var(--border);font-size:13px;
+  }
+  .doc-row:last-child{border-bottom:none;}
+  .doc-link{color:var(--accent);font-size:12px;text-decoration:none;font-weight:600;cursor:pointer;}
+
+  /* document viewer modal */
+  .doc-modal-backdrop{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(20,32,25,.45);
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 16px;
+    z-index:100;
+    overflow-y:auto;
+  }
+  .doc-modal-backdrop.open{display:flex;}
+  .doc-modal{
+    background:var(--surface);
+    width:100%; max-width:620px;
+    border-radius:10px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+    overflow:hidden;
+    animation:doc-pop .15s ease-out;
+  }
+  @keyframes doc-pop{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .doc-modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    font-weight:600; font-size:14px;
+  }
+  .doc-modal-close{
+    border:none; background:none; cursor:pointer;
+    font-size:16px; color:var(--muted); line-height:1;
+    padding:4px 6px; border-radius:6px;
+  }
+  .doc-modal-close:hover{background:var(--accent-light); color:var(--accent);}
+  .doc-modal-body{padding:20px 22px; max-height:70vh; overflow-y:auto;}
+  .doc-modal-foot{
+    padding:10px 18px; font-size:11px; color:var(--faint);
+    border-top:1px solid var(--border); background:var(--bg);
+  }
+  .doc-sheet{
+    font-family:var(--sans); font-size:13px; color:var(--ink);
+    border:1px solid var(--border); border-radius:8px; padding:18px;
+  }
+  .doc-sheet h3{margin:0 0 4px; font-size:15px;}
+  .doc-sheet .doc-sub{color:var(--muted); font-size:12px; margin:0 0 16px;}
+  .doc-sheet-row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--border); font-size:12.5px;}
+  .doc-sheet-row:last-child{border-bottom:none;}
+  .doc-sheet-row .k{color:var(--muted);}
+  .doc-sheet-row .v{font-weight:600; font-family:var(--mono);}
+  .doc-list-mini{list-style:none; margin:0; padding:0;}
+  .doc-list-mini li{padding:5px 0; font-size:12.5px; display:flex; justify-content:space-between; border-bottom:1px solid var(--border);}
+  .doc-list-mini li:last-child{border-bottom:none;}
+
+  footer.hub-footer{
+    padding:24px 20px 0;font-size:11px;color:var(--faint);
+  }
+  .footer-tools{
+    padding:10px 20px 4px;font-size:11px;color:var(--faint);line-height:1.9;
+  }
+  .footer-tools a{color:var(--accent);text-decoration:none;}
+  .footer-tools a:hover{text-decoration:underline;}
+  @media (max-width:520px){
+    .table-wrap table{min-width:560px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="banner"><span class="dot"></span>Mock environment — synthetic data only, no real accounts or PII</div>
+
+  <header class="hdr">
+    <div class="hdr-top">
+      <span class="brand">EXAMPLE BANK · Account Hub</span>
+      <span class="status-pill"><span class="dot"></span>Active · Verified</span>
+    </div>
+
+    <div class="profile-card">
+      <div class="avatar">JD</div>
+      <div>
+        <p class="profile-name">Jane Doe</p>
+        <p class="profile-sub">Personal Checking + Crypto · Member since Jan 14, 2025</p>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>Account number</label>
+            <span class="val" id="acct-num">•••• •••• 4821</span>
+            <button class="reveal-btn" onclick="toggleAcct()">show</button>
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <span class="val">(415) 555-0148</span>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <span class="val">jane.doe@example.com</span>
+          </div>
+          <div class="field">
+            <label>Mailing address</label>
+            <span class="val" style="font-family:var(--sans);">42 Bayview Ter, San Francisco, CA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabnav">
+    <button class="active" data-tab="home">Home</button>
+    <button data-tab="payment">Payment methods</button>
+    <button data-tab="ach">ACH history</button>
+    <button data-tab="crypto">Crypto activity</button>
+    <button data-tab="login">Login / IP log</button>
+    <button data-tab="security">Security & KYC</button>
+    <button data-tab="docs">Documents</button>
+  </nav>
+
+  <main>
+
+    <!-- HOME -->
+    <section class="panel active" id="home">
+      <h2 class="section-title">Account activity</h2>
+      <p class="section-sub">Non-transactional account events, most recent first.</p>
+      <ul class="timeline">
+        <li class="flagged"><p class="tl-title">External payee added</p><p class="tl-meta">Aug 31, 2026 · 9:40 AM</p><p class="tl-detail">Marcus T. — account ending 1187</p></li>
+        <li class="flagged"><p class="tl-title">Two-factor method changed</p><p class="tl-meta">Aug 30, 2026 · 12:18 AM</p><p class="tl-detail">SMS → Email (temporary, self-service)</p></li>
+        <li><p class="tl-title">Password reset (self-service)</p><p class="tl-meta">Aug 28, 2026 · 6:41 PM</p></li>
+        <li><p class="tl-title">Phone number updated</p><p class="tl-meta">Jul 30, 2026 · 2:03 PM</p><p class="tl-detail">(415) 555-0119 → (415) 555-0148</p></li>
+        <li><p class="tl-title">Beneficiary added</p><p class="tl-meta">Mar 22, 2026 · 9:18 AM</p><p class="tl-detail">Added "M. Doe" as payable-on-death beneficiary</p></li>
+        <li class="flagged"><p class="tl-title">Security question reset</p><p class="tl-meta">Feb 8, 2026 · 4:52 PM</p><p class="tl-detail">Initiated after failed login attempts</p></li>
+        <li><p class="tl-title">Second ACH bank account linked</p><p class="tl-meta">Nov 2, 2025 · 11:27 AM</p><p class="tl-detail">Ally Bank Savings •••7790</p></li>
+        <li><p class="tl-title">Two-factor authentication enabled</p><p class="tl-meta">Aug 19, 2025 · 8:14 AM</p><p class="tl-detail">Method: SMS</p></li>
+        <li><p class="tl-title">Email address changed</p><p class="tl-meta">Aug 19, 2025 · 8:09 AM</p><p class="tl-detail">j.doe88@example.com → jane.doe@example.com</p></li>
+        <li><p class="tl-title">Mailing address updated</p><p class="tl-meta">Jun 3, 2025 · 1:40 PM</p><p class="tl-detail">118 Elm St, Oakland, CA → 42 Bayview Ter, San Francisco, CA</p></li>
+        <li><p class="tl-title">ACH bank account linked</p><p class="tl-meta">Jan 16, 2025 · 10:02 AM</p><p class="tl-detail">Chase Checking •••4821 (set as default)</p></li>
+        <li><p class="tl-title">Identity verification completed</p><p class="tl-meta">Jan 14, 2025 · 3:55 PM</p><p class="tl-detail">KYC passed via document + selfie match</p></li>
+        <li><p class="tl-title">Account created</p><p class="tl-meta">Jan 14, 2025 · 3:41 PM</p><p class="tl-detail">Opened via mobile app, referral code EB-2025</p></li>
+      </ul>
+    </section>
+
+    <!-- PAYMENT METHODS -->
+    <section class="panel" id="payment">
+      <h2 class="section-title">Linked bank accounts (ACH)</h2>
+      <div class="pm-group">
+        <div class="pm-row">
+          <div class="pm-main">
+            <span class="pm-name">Chase Checking •••4821</span>
+            <span class="pm-sub">Routing •••0021 · Default for withdrawals</span>
+          </div>
+          <div class="pm-right"><span class="badge ok">Verified</span><span class="pm-date">Added Jan 16, 2025</span></div>
+        </div>
+        <div class="pm-row">
+          <div class="pm-main">
+            <span class="pm-name">Ally Bank Savings •••7790</span>
+            <span class="pm-sub">Routing •••0544</span>
+          </div>
+          <div class="pm-right"><span class="badge ok">Verified</span><span class="pm-date">Added Nov 2, 2025</span></div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Cards</h2>
+      <div class="pm-group">
+        <div class="pm-row">
+          <div class="pm-main">
+            <span class="pm-name">Visa Debit •••• 5567</span>
+            <span class="pm-sub">Exp 09/28</span>
+          </div>
+          <div class="pm-right"><span class="badge ok">Active</span><span class="pm-date">Added Jan 14, 2025</span></div>
+        </div>
+        <div class="pm-row">
+          <div class="pm-main">
+            <span class="pm-name">Mastercard Credit •••• 1190</span>
+            <span class="pm-sub">Exp 03/27</span>
+          </div>
+          <div class="pm-right"><span class="badge removed">Removed</span><span class="pm-date">Removed Jun 20, 2025</span></div>
+        </div>
+      </div>
+
+      <h2 class="section-title">External crypto wallets</h2>
+      <div class="pm-group">
+        <div class="pm-row">
+          <div class="pm-main">
+            <span class="pm-name">Coinbase external wallet (BTC)</span>
+            <span class="pm-sub">bc1q...4f2a · Withdrawal allowlist</span>
+          </div>
+          <div class="pm-right"><span class="badge ok">Verified</span><span class="pm-date">Added Apr 2, 2026</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACH HISTORY -->
+    <section class="panel" id="ach">
+      <h2 class="section-title">ACH transaction history</h2>
+      <p class="section-sub">All incoming and outgoing ACH transfers.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th class="num">Amount</th><th>Linked account</th><th>Status</th><th>Reference</th></tr></thead>
+          <tbody id="ach-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CRYPTO -->
+    <section class="panel" id="crypto">
+      <h2 class="section-title">Crypto activity</h2>
+      <p class="section-sub">Buys, sells, and transfers across supported assets.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Asset</th><th class="num">Amount</th><th class="num">USD value</th><th>Wallet / address</th><th>Status</th></tr></thead>
+          <tbody id="crypto-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LOGIN / IP LOG -->
+    <section class="panel" id="login">
+      <h2 class="section-title">Login and IP address log</h2>
+      <p class="section-sub">Authentication attempts across all devices.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date / time</th><th>IP address</th><th>Location</th><th>Device / browser</th><th>Result</th><th>Notes</th></tr></thead>
+          <tbody id="login-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECURITY & KYC -->
+    <section class="panel" id="security">
+      <h2 class="section-title">Identity verification</h2>
+      <div class="kv-card">
+        <div class="kv-row"><span class="k">KYC status</span><span class="v" style="color:var(--accent);font-family:var(--sans);font-weight:600;">Verified</span></div>
+        <div class="kv-row"><span class="k">Verified on</span><span class="v">Jan 14, 2025</span></div>
+        <div class="kv-row"><span class="k">ID type</span><span class="v" style="font-family:var(--sans);">CA Driver's License</span></div>
+        <div class="kv-row"><span class="k">Verification vendor</span><span class="v" style="font-family:var(--sans);">IDVerify Co.</span></div>
+        <div class="kv-row"><span class="k">Match confidence</span><span class="v">98.2%</span></div>
+      </div>
+
+      <h2 class="section-title">Authentication</h2>
+      <div class="kv-card">
+        <div class="kv-row"><span class="k">2FA method</span><span class="v" style="font-family:var(--sans);">Email (changed from SMS, Aug 30 2026)</span></div>
+        <div class="kv-row"><span class="k">2FA enabled</span><span class="v">Aug 19, 2025</span></div>
+        <div class="kv-row"><span class="k">Backup codes</span><span class="v" style="font-family:var(--sans);">Generated, 8 unused</span></div>
+        <div class="kv-row"><span class="k">Trusted devices</span><span class="v" style="font-family:var(--sans);">iPhone 15, MacBook Pro</span></div>
+      </div>
+
+      <h2 class="section-title">Risk & review flags</h2>
+      <div class="kv-card">
+        <div class="kv-row"><span class="k">Aug 31, 2026 — Large withdrawal to new payee</span><span class="v"><span class="badge pending">Open</span></span></div>
+        <div class="kv-row"><span class="k">$4,800.00 to payee added same week</span><span class="v" style="font-family:var(--sans);color:var(--muted);">No resolution logged</span></div>
+        <div class="kv-row"><span class="k">Aug 30, 2026 — 2FA method downgraded</span><span class="v"><span class="badge pending">Open</span></span></div>
+        <div class="kv-row"><span class="k">SMS → Email, self-service</span><span class="v" style="font-family:var(--sans);color:var(--muted);">No resolution logged</span></div>
+        <div class="kv-row"><span class="k">Apr 2, 2026 — Crypto withdrawal</span><span class="v"><span class="badge flag">Cleared</span></span></div>
+        <div class="kv-row"><span class="k">Withdrawal to address added same day</span><span class="v" style="font-family:var(--sans);color:var(--muted);">Reviewed Apr 5, 2026</span></div>
+        <div class="kv-row"><span class="k">Aug 29, 2026 — Login anomaly</span><span class="v"><span class="badge pending">Monitoring</span></span></div>
+        <div class="kv-row"><span class="k">Failed logins from foreign IP</span><span class="v" style="font-family:var(--sans);color:var(--muted);">Account auto-locked 30 min</span></div>
+      </div>
+
+      <h2 class="section-title">Investigator tools</h2>
+      <div class="kv-card">
+        <div class="doc-row"><span>Timeline the account events above</span><a class="doc-link" href="https://biancabcarlson.github.io/Case-Timeline-Builder/" target="_blank" rel="noopener">Case Timeline Builder ↗</a></div>
+        <div class="doc-row"><span>Check the withdrawal/exposure math</span><a class="doc-link" href="https://biancabcarlson.github.io/Case-Calculator/" target="_blank" rel="noopener">Case Calculator ↗</a></div>
+        <div class="doc-row"><span>Look up the new payee / beneficiary name</span><a class="doc-link" href="https://biancabcarlson.github.io/OSINT-Tool/" target="_blank" rel="noopener">OSINT Tool ↗</a></div>
+        <div class="doc-row"><span>Check name variants against past cases</span><a class="doc-link" href="https://biancabcarlson.github.io/Entity-Name-Matcher/" target="_blank" rel="noopener">Entity Name Matcher ↗</a></div>
+        <div class="doc-row"><span>Track what's still needed for this case</span><a class="doc-link" href="https://biancabcarlson.github.io/Case-Doc-Tracker/" target="_blank" rel="noopener">Case Doc Tracker ↗</a></div>
+        <div class="doc-row"><span>Write up the findings</span><a class="doc-link" href="https://biancabcarlson.github.io/Report-Template-Filler/" target="_blank" rel="noopener">Report Template Filler ↗</a></div>
+      </div>
+    </section>
+
+    <!-- DOCUMENTS -->
+    <section class="panel" id="docs">
+      <h2 class="section-title">Statements</h2>
+      <div class="kv-card">
+        <div class="doc-row"><span>August 2026 statement</span><a class="doc-link" href="#" data-doc="stmt-2026-08">View</a></div>
+        <div class="doc-row"><span>July 2026 statement</span><a class="doc-link" href="#" data-doc="stmt-2026-07">View</a></div>
+        <div class="doc-row"><span>June 2026 statement</span><a class="doc-link" href="#" data-doc="stmt-2026-06">View</a></div>
+        <div class="doc-row"><span>All statements (19 total)</span><a class="doc-link" href="#" data-doc="stmt-all">View all</a></div>
+      </div>
+
+      <h2 class="section-title">Tax and account documents</h2>
+      <div class="kv-card">
+        <div class="doc-row"><span>1099-INT — Tax year 2025</span><a class="doc-link" href="#" data-doc="1099-int">View</a></div>
+        <div class="doc-row"><span>1099-B — Crypto activity, Tax year 2025</span><a class="doc-link" href="#" data-doc="1099-b">View</a></div>
+        <div class="doc-row"><span>Account agreement (signed Jan 14, 2025)</span><a class="doc-link" href="#" data-doc="agreement">View</a></div>
+        <div class="doc-row"><span>W-9 on file</span><a class="doc-link" href="#" data-doc="w9">View</a></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="hub-footer">Example Bank Account Hub · Mock/test data · Not a real financial institution</footer>
+</div>
+
+<!-- DOCUMENT VIEWER MODAL -->
+<div class="doc-modal-backdrop" id="doc-modal-backdrop">
+  <div class="doc-modal" role="dialog" aria-modal="true" aria-labelledby="doc-modal-title">
+    <div class="doc-modal-head">
+      <span id="doc-modal-title">Document</span>
+      <button class="doc-modal-close" id="doc-modal-close" aria-label="Close">✕</button>
+    </div>
+    <div class="doc-modal-body" id="doc-modal-body"></div>
+    <div class="doc-modal-foot">Mock/test document · Rendered from synthetic fixture data · Not a real financial institution</div>
+  </div>
+</div>
+
+<script>
+  // tab switching
+  document.getElementById('tabnav').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-tab]');
+    if (!btn) return;
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+
+  let revealed = false;
+  function toggleAcct(){
+    revealed = !revealed;
+    document.getElementById('acct-num').textContent = revealed ? '4821 0093 4821' : '•••• •••• 4821';
+    document.querySelector('.reveal-btn').textContent = revealed ? 'hide' : 'show';
+  }
+
+  const achRows = [
+    ['2026-09-01','Deposit','+$2,400.00','Chase •••4821','ok','Completed','ACH-88213'],
+    ['2026-08-31','Withdrawal','-$4,800.00','External •••1187 (new payee)','flag','Pending — flagged for review','ACH-88300'],
+    ['2026-08-15','Withdrawal','-$500.00','Ally •••7790','ok','Completed','ACH-88147'],
+    ['2026-08-01','Deposit','+$2,400.00','Chase •••4821','ok','Completed','ACH-88022'],
+    ['2026-07-22','Withdrawal','-$1,200.00','Chase •••4821','fail','Returned — R01 insufficient funds','ACH-87911'],
+    ['2026-07-15','Deposit','+$2,400.00','Chase •••4821','ok','Completed','ACH-87804'],
+    ['2026-06-30','Withdrawal','-$300.00','Ally •••7790','ok','Completed','ACH-87650'],
+    ['2026-06-01','Deposit','+$2,400.00','Chase •••4821','ok','Completed','ACH-87400'],
+    ['2026-05-18','Withdrawal','-$5,000.00','Chase •••4821','pending','Pending','ACH-87255'],
+    ['2026-05-01','Deposit','+$2,400.00','Chase •••4821','ok','Completed','ACH-87050'],
+  ];
+  const achBody = document.getElementById('ach-body');
+  achRows.forEach(r => {
+    const [date,type,amt,acct,cls,status,ref] = r;
+    const amtCls = amt.startsWith('+') ? 'amt-pos' : 'amt-neg';
+    achBody.innerHTML += `<tr>
+      <td>${date}</td><td>${type}</td>
+      <td class="num ${amtCls}">${amt}</td>
+      <td class="num">${acct}</td>
+      <td><span class="badge ${cls}">${status}</span></td>
+      <td class="num">${ref}</td>
+    </tr>`;
+  });
+
+  const cryptoRows = [
+    ['2026-08-30','Buy','BTC','0.0421','$2,850.00','Internal custody wallet','ok','Completed'],
+    ['2026-08-20','Withdrawal','BTC','0.0150','$1,015.50','bc1q...4f2a (allowlisted)','ok','Completed'],
+    ['2026-07-28','Sell','ETH','1.2000','$3,960.00','Internal custody wallet','ok','Completed'],
+    ['2026-07-10','Deposit','USDC','5,000.00','$5,000.00','0x8f...c91d','ok','Completed'],
+    ['2026-06-14','Buy','ETH','0.8500','$2,720.00','Internal custody wallet','ok','Completed'],
+    ['2026-04-02','Withdrawal','BTC','0.1000','$6,430.00','bc1q...4f2a (added same day)','flag','Flagged for review'],
+  ];
+  const cryptoBody = document.getElementById('crypto-body');
+  cryptoRows.forEach(r => {
+    const [date,type,asset,amt,usd,wallet,cls,status] = r;
+    cryptoBody.innerHTML += `<tr>
+      <td>${date}</td><td>${type}</td><td>${asset}</td>
+      <td class="num">${amt}</td><td class="num">${usd}</td>
+      <td class="num">${wallet}</td>
+      <td><span class="badge ${cls}">${status}</span></td>
+    </tr>`;
+  });
+
+  const loginRows = [
+    ['2026-09-04 8:12 PM','73.162.44.9','San Francisco, CA, US','iPhone — Safari 18','ok','Success','Trusted device'],
+    ['2026-09-02 7:05 AM','73.162.44.9','San Francisco, CA, US','iPhone — Safari 18','ok','Success','Trusted device'],
+    ['2026-08-30 12:24 AM','185.220.101.47','Bucharest, RO','Windows — Chrome 128','flag','Success','2FA changed to email first; device not trusted'],
+    ['2026-08-29 11:52 PM','185.220.101.47','Bucharest, RO','Windows — Chrome 128','pending','MFA challenge sent','Not completed'],
+    ['2026-08-29 11:47 PM','185.220.101.47','Bucharest, RO','Windows — Chrome 128','fail','Failed (3x)','Account locked 30 min'],
+    ['2026-08-19 9:03 AM','98.42.11.203','San Francisco, CA, US','MacBook — Chrome 127','ok','Success','New device, verified via email'],
+    ['2026-07-01 1:15 PM','73.162.44.9','San Francisco, CA, US','iPhone — Safari 17','ok','Success','Trusted device'],
+  ];
+  const loginBody = document.getElementById('login-body');
+  loginRows.forEach(r => {
+    const [dt,ip,loc,device,cls,result,notes] = r;
+    loginBody.innerHTML += `<tr>
+      <td class="num">${dt}</td><td class="num">${ip}</td><td>${loc}</td><td>${device}</td>
+      <td><span class="badge ${cls}">${result}</span></td><td>${notes}</td>
+    </tr>`;
+  });
+
+  // ---- Document viewer (mock previews built from the fixture data) ----
+  const acctName = "Jane Doe";
+  const acctMasked = "•••• •••• 4821";
+
+  function statementSheet(monthLabel, openBal, closeBal, rows){
+    const rowsHtml = rows.map(r => `<div class="doc-sheet-row"><span class="k">${r[0]} — ${r[1]}</span><span class="v">${r[2]}</span></div>`).join('');
+    return `<div class="doc-sheet">
+      <h3>Example Bank — Monthly Statement</h3>
+      <p class="doc-sub">${monthLabel} · Account ${acctMasked} · ${acctName}</p>
+      <div class="doc-sheet-row"><span class="k">Opening balance</span><span class="v">${openBal}</span></div>
+      ${rowsHtml}
+      <div class="doc-sheet-row"><span class="k">Closing balance</span><span class="v">${closeBal}</span></div>
+    </div>`;
+  }
+
+  const docTemplates = {
+    'stmt-2026-08': () => statementSheet('August 2026', '$4,120.00', '$6,020.00', [
+      ['08-01','Deposit ACH-88022','+$2,400.00'],
+      ['08-15','Withdrawal ACH-88147','-$500.00'],
+      ['08-30','Crypto buy (BTC)','-$2,850.00, offset by transfer in'],
+    ]),
+    'stmt-2026-07': () => statementSheet('July 2026', '$1,220.00', '$4,120.00', [
+      ['07-15','Deposit ACH-87804','+$2,400.00'],
+      ['07-22','Withdrawal ACH-87911','-$1,200.00 (returned, R01)'],
+      ['07-28','Crypto sell (ETH)','+$3,960.00 credited to custody'],
+    ]),
+    'stmt-2026-06': () => statementSheet('June 2026', '$3,120.00', '$1,220.00', [
+      ['06-01','Deposit ACH-87400','+$2,400.00'],
+      ['06-14','Crypto buy (ETH)','-$2,720.00'],
+      ['06-30','Withdrawal ACH-87650','-$300.00'],
+    ]),
+    'stmt-all': () => `<div class="doc-sheet">
+      <h3>All statements</h3>
+      <p class="doc-sub">Account ${acctMasked} · ${acctName}</p>
+      <ul class="doc-list-mini">
+        ${['2026-08','2026-07','2026-06','2026-05','2026-04','2026-03','2026-02','2026-01','2025-12','2025-11']
+          .map(m => `<li><span>${m} statement</span><span style="color:var(--muted);">PDF · mock</span></li>`).join('')}
+        <li><span>… 9 earlier statements</span><span style="color:var(--muted);">archived</span></li>
+      </ul>
+    </div>`,
+    '1099-int': () => `<div class="doc-sheet">
+      <h3>Form 1099-INT (mock)</h3>
+      <p class="doc-sub">Tax year 2025 · ${acctName} · Account ${acctMasked}</p>
+      <div class="doc-sheet-row"><span class="k">Payer</span><span class="v" style="font-family:var(--sans);">Example Bank</span></div>
+      <div class="doc-sheet-row"><span class="k">Box 1 — Interest income</span><span class="v">$46.12</span></div>
+      <div class="doc-sheet-row"><span class="k">Recipient</span><span class="v" style="font-family:var(--sans);">${acctName}</span></div>
+    </div>`,
+    '1099-b': () => `<div class="doc-sheet">
+      <h3>Form 1099-B (mock)</h3>
+      <p class="doc-sub">Tax year 2025 · Crypto activity · ${acctName}</p>
+      <div class="doc-sheet-row"><span class="k">Proceeds (ETH sale, Jul 28)</span><span class="v">$3,960.00</span></div>
+      <div class="doc-sheet-row"><span class="k">Cost basis (est.)</span><span class="v">$2,720.00</span></div>
+      <div class="doc-sheet-row"><span class="k">Gain/loss</span><span class="v">+$1,240.00</span></div>
+    </div>`,
+    'agreement': () => `<div class="doc-sheet">
+      <h3>Account Agreement (mock)</h3>
+      <p class="doc-sub">Signed Jan 14, 2025 · ${acctName}</p>
+      <div class="doc-sheet-row"><span class="k">Account type</span><span class="v" style="font-family:var(--sans);">Personal Checking + Crypto</span></div>
+      <div class="doc-sheet-row"><span class="k">Signature method</span><span class="v" style="font-family:var(--sans);">E-sign, mobile app</span></div>
+      <div class="doc-sheet-row"><span class="k">Referral code</span><span class="v">EB-2025</span></div>
+    </div>`,
+    'w9': () => `<div class="doc-sheet">
+      <h3>Form W-9 on file (mock)</h3>
+      <p class="doc-sub">${acctName}</p>
+      <div class="doc-sheet-row"><span class="k">Name</span><span class="v" style="font-family:var(--sans);">${acctName}</span></div>
+      <div class="doc-sheet-row"><span class="k">Address on file</span><span class="v" style="font-family:var(--sans);">42 Bayview Ter, San Francisco, CA</span></div>
+      <div class="doc-sheet-row"><span class="k">Status</span><span class="v" style="font-family:var(--sans);">On file, unchanged since account opening</span></div>
+    </div>`,
+  };
+
+  const docTitles = {
+    'stmt-2026-08':'August 2026 statement','stmt-2026-07':'July 2026 statement','stmt-2026-06':'June 2026 statement',
+    'stmt-all':'All statements','1099-int':'1099-INT — Tax year 2025','1099-b':'1099-B — Crypto activity',
+    'agreement':'Account agreement','w9':'W-9 on file'
+  };
+
+  const docBackdrop = document.getElementById('doc-modal-backdrop');
+  const docTitleEl = document.getElementById('doc-modal-title');
+  const docBodyEl = document.getElementById('doc-modal-body');
+
+  function openDoc(key){
+    const build = docTemplates[key];
+    if (!build) return;
+    docTitleEl.textContent = docTitles[key] || 'Document';
+    docBodyEl.innerHTML = build();
+    docBackdrop.classList.add('open');
+  }
+  function closeDoc(){ docBackdrop.classList.remove('open'); }
+
+  document.querySelectorAll('.doc-link[data-doc]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      openDoc(link.dataset.doc);
+    });
+  });
+  document.getElementById('doc-modal-close').addEventListener('click', closeDoc);
+  docBackdrop.addEventListener('click', (e) => { if (e.target === docBackdrop) closeDoc(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDoc(); });
+</script>
+</body>
+</html>
